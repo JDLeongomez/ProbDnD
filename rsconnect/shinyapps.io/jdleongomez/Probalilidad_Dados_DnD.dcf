@@ -1,0 +1,14 @@
+name: Probalilidad_Dados_DnD
+title: Probalilidad_Dados_DnD
+username:
+account: jdleongomez
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 4467909
+bundleId: 4900276
+url: https://jdleongomez.shinyapps.io/Probalilidad_Dados_DnD/
+when: 1628407084.76108
+lastSyncTime: 1628407084.76108
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: www/dice2.png
