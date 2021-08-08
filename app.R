@@ -22,6 +22,8 @@ ui <- fluidPage(theme = shinytheme("slate"),
     p("Creado por",
       HTML("<a style=color:#ce0000ff;  href='https://jdleongomez.info/es/'>Juan David Leongómez</a>"),
       "· 2021"),
+    p("Código disponible en",
+      HTML("<a style=color:#ce0000ff;  href='https://github.com/JDLeongomez/ProbDnD'>GitHub</a>")),
     
     fluidRow(
         column(2,
@@ -123,8 +125,8 @@ server <- function(input, output, session){
     datPre <- reactive({
       dats <- data.frame(
         d1 = rowSums(replicate(input$Dado1Num, sample(1:input$Dado1Max, input$reps, replace=T))),
-        d2 = ifelse(input$Dado2Num == 0, rep(0, times = reps), rowSums(replicate(input$Dado2Num, sample(1:input$Dado2Max, input$reps, replace=T)))),
-        d3 = ifelse(input$Dado3Num == 0, rep(0, times = reps), rowSums(replicate(input$Dado3Num, sample(1:input$Dado3Max, input$reps, replace=T)))))
+        d2 = ifelse(input$Dado2Num == 0, rep(0, times = input$reps), rowSums(replicate(input$Dado2Num, sample(1:input$Dado2Max, input$reps, replace=T)))),
+        d3 = ifelse(input$Dado3Num == 0, rep(0, times = input$reps), rowSums(replicate(input$Dado3Num, sample(1:input$Dado3Max, input$reps, replace=T)))))
       return(dats)
       })
     data <- reactive({
@@ -160,7 +162,7 @@ server <- function(input, output, session){
         geom_vline(xintercept = input$Need, size = 2, alpha = 0.5) +
         annotate(geom = "text", 
                  x = input$Need, y = 0.04, vjust = 2, hjust = 1, angle=90,
-                 text = element_text(size = 30),
+                 #text = element_text(size = 30),
                  label = paste0("Número mínimo deseado", " = ", input$Need)) +
         labs(x = "Suma dados y modificador", y = "Probabilidad", fill = "Probabilidad")
         })
