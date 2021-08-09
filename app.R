@@ -13,20 +13,24 @@ library(shinythemes)
 library(ggplot2)
 library(dplyr)
 library(scales)
+library(fontawesome)
 
 # Define UI for application that draws a histogram
 ui <- fluidPage(theme = shinytheme("slate"),
 
     # Application title
-    titlePanel(title=div(img(src="dnd.png", width="300"), "Probabilidad de obtener un número con múltiple dados")),
-    p("Creado por",
-      HTML("<a style=color:#ce0000ff;  href='https://jdleongomez.info/es/'>Juan David Leongómez</a>"),
-      "· 2021"),
-    p("Código disponible en",
-      HTML("<a style=color:#ce0000ff;  href='https://github.com/JDLeongomez/ProbDnD'>GitHub</a>")),
-    
+    titlePanel(HTML("<center>Probabilidad de obtener un número con múltiple dados
+                         con base en simulaciones</center>")),
+    HTML("<center><img src='dnd.png'' width='200'></center>"),
+    p(HTML("<center>Código disponible en
+      <a style=color:#ce0000ff;  href='https://github.com/JDLeongomez/ProbDnD'>GitHub</a>
+      - Creado por 
+      <a style=color:#ce0000ff;  href='https://jdleongomez.info/es/'>Juan David Leongómez</a>
+      · 2021</center>")),
+    p(),
+    hr(),
     fluidRow(
-        column(2,
+        column(3,
                tags$h2("Dados", img(src="dice.png", width="80"), img(src="dice.png", width="80")),
                tags$h4("Primer tipo de dado"),
                numericInput(inputId = "Dado1Max",
@@ -74,7 +78,7 @@ ui <- fluidPage(theme = shinytheme("slate"),
                             step = 1,
                             width = '400px')
                ),
-        column(2,
+        column(3,
                tags$h2("Modificador"),
                numericInput(inputId = "modifier",
                             label = "Escribe el modificador (si hay)",
@@ -112,6 +116,16 @@ ui <- fluidPage(theme = shinytheme("slate"),
         column(5,
                tags$h1("Distribución de resultados"),
                plotOutput("probPlot"),
+               tags$p(HTML("<b style=color:#ce0000ff;>NOTA: </b>"), 
+                      " Para que el histograma de la simulación se vea bien, el", 
+                      HTML("<b>  valor mínimo total esperado</b>"),
+                      "debe estar dentro de las posibilidades de la suma 
+                      de los dados lanzados y el modificador. Por ejemplo, al lanzar",
+                      HTML("<b> 1d20 + 3</b>"), "el resultado solo puede estar entre 4 y 23.
+                      Si selecciono un", HTML("<b>  valor mínimo total esperado</b>"), 
+                      "menor a 4 o mayor a 23, el histograma se verá extraño, aunque la",
+                      HTML("<b>  probabilidad</b>"), 
+                      "(mostrada más abajo) será correcta."),
                hr(),
                tags$h1("Probabilidad"),
                htmlOutput("probText"),
@@ -125,8 +139,8 @@ server <- function(input, output, session){
     datPre <- reactive({
       dats <- data.frame(
         d1 = rowSums(replicate(input$Dado1Num, sample(1:input$Dado1Max, input$reps, replace=T))),
-        d2 = ifelse(input$Dado2Num == 0, rep(0, times = input$reps), rowSums(replicate(input$Dado2Num, sample(1:input$Dado2Max, input$reps, replace=T)))),
-        d3 = ifelse(input$Dado3Num == 0, rep(0, times = input$reps), rowSums(replicate(input$Dado3Num, sample(1:input$Dado3Max, input$reps, replace=T)))))
+        d2 = rep(0, times = input$reps),
+        d3 = rep(0, times = input$reps))
       return(dats)
       })
     data <- reactive({
@@ -147,7 +161,7 @@ server <- function(input, output, session){
     #Calcular probabilidad por encima del número deseado
     probAbovePre <- reactive({
       prob <- probPre()
-      percent(sum(prob > input$Need)/input$reps)}) 
+      percent(sum(prob >= input$Need)/input$reps)}) 
 
     #Crear histograma
     output$probPlot <- renderPlot({
@@ -156,14 +170,14 @@ server <- function(input, output, session){
       #Histograma de valores
       ggplot() + 
         geom_histogram(aes(prob, y = ..density.., fill = ..density..), bins = max(prob)-min(prob)+1, color = "black", alpha = 0.5) +
-        #geom_density(aes(prob, y = ..density..), color = "black", size = 3) +
+        #geom_density(aes(prob, y = ..density..), size = 0.5, adjust = 4) +
         scale_fill_gradient(low = "midnightblue", high = "red") +
         scale_x_continuous(breaks = seq(min(prob), max(prob), by = 1)) +
         geom_vline(xintercept = input$Need, size = 2, alpha = 0.5) +
         annotate(geom = "text", 
                  x = input$Need, y = 0.04, vjust = 2, hjust = 1, angle=90,
-                 #text = element_text(size = 30),
-                 label = paste0("Número mínimo deseado", " = ", input$Need)) +
+                 size = 5,
+                 label = paste0("Valor mínimo total esperado", " = ", input$Need)) +
         labs(x = "Suma dados y modificador", y = "Probabilidad", fill = "Probabilidad")
         })
         #Crear texto
@@ -174,7 +188,7 @@ server <- function(input, output, session){
             ifelse(input$Dado3Num == 0, "", paste(" + ", input$Dado3Num,"d",input$Dado3Max)),
             ifelse(input$modifier == 0, "", paste(" + ", input$modifier)),
             "</b></font>, la probabilidad de obtener un valor total de <font color=\'#FF0000\'><b>",
-            input$Need, "</b></font> o mayor, es de aproximadamente:")
+            input$Need, " o más</b></font>, es de aproximadamente:")
       })
     output$probPerc <- renderText({
       probAbove <- probAbovePre()
