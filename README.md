@@ -7,4 +7,4 @@ Calcula, con base en simulaciones, la probabilidad de obtener un valor en DnD, c
 La app está disponible [acá](https://jdleongomez.shinyapps.io/Probalilidad_Dados_DnD/).
 
 
-![image](https://user-images.githubusercontent.com/45215832/128624441-3e221566-7e50-4859-8078-0311b7ea988a.png)
+![image](https://user-images.githubusercontent.com/45215832/128649885-2d7c1fad-83e1-43df-a119-e84632cbcfeb.png)
