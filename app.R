@@ -32,7 +32,7 @@ ui <- fluidPage(theme = shinytheme("slate"),
     fluidRow(
         column(3,
                tags$h2("Dados", img(src="dice.png", width="80"), img(src="dice.png", width="80")),
-               tags$h4("Primer tipo de dado"),
+               tags$h4("Primer tipo de dado (obligatorio)"),
                numericInput(inputId = "Dado1Max",
                             label = "¿Cuántas caras tiene?",
                             min = 1,
@@ -47,7 +47,7 @@ ui <- fluidPage(theme = shinytheme("slate"),
                             value = 1,
                             step = 1,
                             width = '400px'),
-               tags$h4("Segundo tipo de dado"),
+               tags$h4("Segundo tipo de dado (opcional)"),
                numericInput(inputId = "Dado2Max",
                             label = "¿Cuántas caras tiene?",
                             min = 1,
@@ -62,7 +62,7 @@ ui <- fluidPage(theme = shinytheme("slate"),
                             value = 1,
                             step = 1,
                             width = '400px'),
-               tags$h4("Tercer tipo de dado"),
+               tags$h4("Tercer tipo de dado (opcional)"),
                numericInput(inputId = "Dado3Max",
                             label = "¿Cuántas caras tiene?",
                             min = 1,
@@ -122,7 +122,7 @@ ui <- fluidPage(theme = shinytheme("slate"),
                       "debe estar dentro de las posibilidades de la suma 
                       de los dados lanzados y el modificador. Por ejemplo, al lanzar",
                       HTML("<b> 1d20 + 3</b>"), "el resultado solo puede estar entre 4 y 23.
-                      Si selecciono un", HTML("<b>  valor mínimo total esperado</b>"), 
+                      Si seleccionas un", HTML("<b>  valor mínimo total esperado</b>"), 
                       "menor a 4 o mayor a 23, el histograma se verá extraño, aunque la",
                       HTML("<b>  probabilidad</b>"), 
                       "(mostrada más abajo) será correcta."),
@@ -168,27 +168,46 @@ server <- function(input, output, session){
       prob <- probPre()
       probAbove <- probAbovePre()
       #Histograma de valores
-      ggplot() + 
+      ggplot() +
+        annotate("rect", xmin = input$Need, xmax =  Inf, ymin = 0, ymax = Inf, 
+                 alpha = 0.4, fill = "white") +
         geom_histogram(aes(prob, y = ..density.., fill = ..density..), bins = max(prob)-min(prob)+1, color = "black", alpha = 0.5) +
         #geom_density(aes(prob, y = ..density..), size = 0.5, adjust = 4) +
         scale_fill_gradient(low = "midnightblue", high = "red") +
         scale_x_continuous(breaks = seq(min(prob), max(prob), by = 1)) +
-        geom_vline(xintercept = input$Need, size = 2, alpha = 0.5) +
+        scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
+        geom_vline(xintercept = input$Need, size = 2, alpha = 0.2) +
         annotate(geom = "text", 
-                 x = input$Need, y = 0.04, vjust = 2, hjust = 1, angle=90,
+                 x = input$Need, y = -Inf, vjust = 0.5, hjust = -0.1, angle=90,
                  size = 5,
                  label = paste0("Valor mínimo total esperado", " = ", input$Need)) +
+        annotate(geom = "text", 
+                 x = Inf, y = Inf, vjust = 2, hjust = 1.1,
+                 size = 7,
+                 color = "white",
+                 label = probAbove) +
+        annotate(geom = "text", 
+                 x = input$Need, y = sum(prob == input$Need)/input$reps, vjust = -0.5, hjust = 0.5,
+                 size = 5,
+                 color = "white",
+                 label = percent(sum(prob == input$Need)/input$reps)) +
+        theme(legend.position = "none") +
         labs(x = "Suma dados y modificador", y = "Probabilidad", fill = "Probabilidad")
         })
-        #Crear texto
+    #Crear texto con resultados detallados
     output$probText <- renderText({
+      prob <- probPre()
       #Mostrar probabilidad de obtener número igual o mayor a
       paste("Al lanzar <font color=\'#FF0000\'><b>",input$Dado1Num,"d", input$Dado1Max,
             ifelse(input$Dado2Num == 0, "", paste(" + ", input$Dado2Num,"d",input$Dado2Max)),
             ifelse(input$Dado3Num == 0, "", paste(" + ", input$Dado3Num,"d",input$Dado3Max)),
             ifelse(input$modifier == 0, "", paste(" + ", input$modifier)),
-            "</b></font>, la probabilidad de obtener un valor total de <font color=\'#FF0000\'><b>",
-            input$Need, " o más</b></font>, es de aproximadamente:")
+            "</b></font>, puedes obtener valores totales que estén entre <font color=\'#FF0000\'><b>",
+            min(prob), "</b></font> y <font color=\'#FF0000\'><b>", max(prob),
+            "</b></font>. La probabilidad de obtener específicamente un valor total de <font color=\'#FF0000\'><b>",
+            input$Need, "</b></font>es de aproximadamente <font color=\'#FF0000\'><b>", percent(sum(prob == input$Need)/input$reps),
+            "</b></font>, mientras que la probabilidad de obtener un valor de <font color=\'#FF0000\'><b>",
+            input$Need, "o más</b></font>, es de aproximadamente:")
       })
     output$probPerc <- renderText({
       probAbove <- probAbovePre()
