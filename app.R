@@ -19,9 +19,14 @@ library(fontawesome)
 ui <- fluidPage(theme = shinytheme("slate"),
 
     # Application title
-    titlePanel(HTML("<center>Probabilidad de obtener un número con múltiples dados
-                         calculado a partir de simulaciones</center>")),
+    titlePanel(
+      title = tags$link(rel = "icon", 
+                        type = "image/gif", 
+                        href = "https://image.pngaaa.com/393/402393-middle.png"),
+      "Probalilidad Dados DnD"),
     HTML("<center><img src='dnd.png'' width='200'></center>"),
+    p(HTML("<center>Cálculo de la probabilidad de obtener un número con múltiples dados, 
+           calculado a partir de simulaciones</center>")),
     p(HTML("<center>Código disponible en
       <a style=color:#ce0000ff;  href='https://github.com/JDLeongomez/ProbDnD'>GitHub</a>
       - Creado por 
