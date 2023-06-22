@@ -31,7 +31,7 @@ ui <- fluidPage(theme = shinytheme("slate"),
       <a style=color:#ce0000ff;  href='https://github.com/JDLeongomez/ProbDnD'>GitHub</a>
       - Creado por 
       <a style=color:#ce0000ff;  href='https://jdleongomez.info/es/'>Juan David Leongómez</a>
-      · 2021 · <a href='https://shiny.jdl-svr.lat/ProbDnD_EN/'>English version</a>
+      · 2021 · <a style=color:#4075de;  href='https://shiny.jdl-svr.lat/ProbDnD_EN/'>English version</a>
       </center>")),
     p(),
     hr(),
