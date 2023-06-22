@@ -6,4 +6,6 @@ Con base en simulaciones, esta app calcula la probabilidad de sacar un valor dad
 
 La app está disponible [acá](https://shiny.jdl-svr.lat/ProbDnD/).
 
+(**NOTE:** For the English version, go to https://shiny.jdl-svr.lat/ProbDnD_EN/)
+
 ![image](https://user-images.githubusercontent.com/45215832/128649885-2d7c1fad-83e1-43df-a119-e84632cbcfeb.png)
